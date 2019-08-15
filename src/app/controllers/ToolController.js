@@ -1,3 +1,5 @@
+import * as Yup from 'yup';
+
 class ToolController {
   async index(req, res) {
     const { tag } = req.query;
@@ -50,7 +52,18 @@ class ToolController {
   }
 
   async create(req, res) {
-    return res.status(201).json(req.body);
+    const schema = Yup.object().shape({
+      title: Yup.string().required(),
+      link: Yup.string().required(),
+      description: Yup.string().required(),
+      tags: Yup.array(),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Invalid request.' });
+    }
+
+    return res.status(201).json({ ...req.body, id: 1 });
   }
 
   async delete(req, res) {
